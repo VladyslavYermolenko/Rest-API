@@ -1,0 +1,55 @@
+[
+    {
+        "id": 1,
+        "listName": "First list",
+        "tasks": [
+            {
+                "id": 1,
+                "taskName": "First Task",
+                "done": false
+            },
+            {
+                "id": 8,
+                "taskName": "Second Task",
+                "done": true
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "listName": "Second list",
+        "tasks": [
+            {
+                "id": 9,
+                "taskName": "First Task",
+                "done": false
+            },
+            {
+                "id": 4,
+                "taskName": "Second Task",
+                "done": false
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "listName": "Third list",
+        "tasks": [
+            {
+                "id": 5,
+                "taskName": "First Task3",
+                "done": true
+            },
+            {
+                "id": 10,
+                "taskName": "Second Task3",
+                "done": true
+            },
+            {
+                "id": 7,
+                "taskName": "Third Task3",
+                "done": true
+            }
+        ]
+    }
+]
