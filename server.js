@@ -6,39 +6,6 @@ app.listen(port, hostname, (error) => {
     error ? console.log(error) : console.log(`Server listens http://${hostname}:${port}`);
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////
 //                     Test commands (lists)                        //
 //////////////////////////////////////////////////////////////////////
