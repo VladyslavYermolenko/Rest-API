@@ -4,11 +4,14 @@ class TaskController {
     getID(arr, curID) {
         return Task.getID(arr, curID);
     }
+    getListIDWithTaskID(taskID) {
+        return Task.getListIDWithTaskID(taskID);
+    }
     getAllTasks() {
         return Task.getAllTasks();
     }
     getTaskByListId(curID) {
-        return Task.getTask(curID);
+        return Task.getTaskByListId(curID);
     }
     createTask(listID, lists) {
         return Task.createTask(listID, lists);

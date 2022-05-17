@@ -8,7 +8,7 @@ router.use('/tasks', tasks);
 router.use('/lists', lists);
 
 router.get('/', (_, res) => {
-    res.redirect('/tasks');
+    res.status(301).redirect('/lists');
 });
 
 router.use(function (_, res, next) {

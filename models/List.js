@@ -2,6 +2,11 @@ let database = require('../database/taskLists.json');
 
 //////////////////////////////////////////////////////////////////////
 
+const increment = (init = database.reduce((prev, cur) => prev['id'] > cur['id'] ? prev : cur['id'])) => () => ++init;
+const primaryKey = increment();
+
+//////////////////////////////////////////////////////////////////////
+
 function getID(arr, curID) {
     return arr.find(i => i['id'] === curID);
 }
@@ -10,14 +15,6 @@ function getID(arr, curID) {
 
 function getAllLists() {
     return database;
-}
-
-function getTask(taskID) {
-    const curListID = getID(database, taskID);
-    
-    if (curListID) {
-        return curListID['tasks'];
-    }
 }
 
 function getList(listID) {
@@ -30,28 +27,7 @@ function getList(listID) {
 
 //////////////////////////////////////////////////////////////////////
 
-function createTask(listID, lists) {
-    const curList = getID(database, listID);
-
-    const increment = (init = curList['tasks'].length) => () => ++init;
-    const primaryKey = increment();
-
-    const newTask = {
-        id: primaryKey(),
-        taskName: lists['taskName'],
-        done: false
-    };
-
-    if (curList) {
-        curList['tasks'].push(newTask);
-        return curList['tasks'];
-    }
-}
-
 function createList(lists) {
-    const increment = (init = lists.length) => () => ++init;
-    const primaryKey = increment();
-
     const newList = {
         id: primaryKey(),
         taskName: lists['listName'],
@@ -64,21 +40,9 @@ function createList(lists) {
 
 //////////////////////////////////////////////////////////////////////
 
-function deleteTask(listID, taskID) {
-    const curList = getID(database, listID);
-    
-    if (curList) {
-        const curTask = getID(curList['tasks'], taskID);
-        if (curTask) {
-            const delTask = database['tasks'].filter(i => i.id !== taskID);
-            return curList['tasks'] = delTask;
-        }
-    }
-}
-
 function deleteList(listID) {
     const curList = getID(database, listID);
-    
+
     if (curList) {
         const delTask = database.filter(i => i.id !== listID);
         return database = delTask;
@@ -87,55 +51,33 @@ function deleteList(listID) {
 
 //////////////////////////////////////////////////////////////////////
 
-function putTask(listID, taskID, lists) {
-    const curTasksInList = getID(database, listID)['tasks'];
-    if (curTasksInList) {
-        const curTask = getID(curTasksInList, taskID);
-        if (curTask) {
-            const putCurTask = {
-                taskName: lists['taskName'],
-                done: false
-            };
-        }
-        Object.assign(curTask, putCurTask);
-        return curTask;
-    }
-}
-
 function putList(listID, lists) {
     const curList = getID(database, listID);
 
     if (curList) {
         const putCurList = {
+            id: curList['id'],
             listName: lists['listName'],
             tasks: []
         };
         Object.assign(curList, putCurList);
         return curList;
     }
-    // or here
-    // Object.assign(curTask, putCurTask);
-    // return curTask;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-function patchTask(listID, taskID, lists) {
-    const curTasksInList = getID(database, listID)['tasks'];
-    if (curTasksInList) {
-        const curTask = getID(curTasksInList, taskID);
-        if (curTask) {
-            Object.assign(curTask, lists);
-            return curTask;
-        }
-    }
-}
-
 function patchList(listID, lists) {
     const curList = getID(database, listID);
+
     if (curList) {
-        Object.assign(curList, lists);
-        return curTask;
+        const patchCurList = {
+            id: curList['id'],
+            listName: lists['listName'] || curList['id'],
+            tasks: lists['tasks'] || curList['tasks']
+        };
+        Object.assign(curList, patchCurList);
+        return curList;
     }
 }
 
@@ -144,19 +86,10 @@ function patchList(listID, lists) {
 module.exports = {
     getID,
     getAllLists,
-    getTask,
     getList,
-
-    createTask,
     createList,
-
-    deleteTask,
     deleteList,
-
-    putTask,
     putList,
-
-    patchTask,
     patchList
 };
 

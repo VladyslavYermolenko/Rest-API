@@ -2,13 +2,24 @@ const database = require('../database/taskLists.json');
 
 //////////////////////////////////////////////////////////////////////
 
-const increment = (init = 0) => () => ++init;
+const increment = (init = getAllTasks().reduce((prev, cur) => prev['id'] > cur['id'] ? prev : cur['id'])) => () => ++init;
 const primaryKey = increment();
 
 //////////////////////////////////////////////////////////////////////
 
 function getID(arr, curID) {
     return arr.find(i => i['id'] === curID);
+}
+
+function getListIDWithTaskID(taskID) {
+    try {
+        let listID = database.find(objList => objList['tasks']
+            .flat().find(objTask => objTask['id'] === taskID));
+        return listID['id'];
+    }
+    catch { TypeError } {
+        return undefined;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -24,7 +35,6 @@ function getAllTasks() {
     }
     tasksList = tasksList.flat()
         .sort((objA, objB) => {
-            console.log(`${objA} ${objB}`)
             if (objA['id'] > objB['id']) {
                 return 1;
             }
@@ -33,14 +43,21 @@ function getAllTasks() {
             }
             return 0;
         });
-    console.log(tasksList);
     return tasksList;
 }
 
-function getTask(curID) {
+function getTaskByListId(curID) {
     const listID = getID(database, curID);
     if (listID) {
-        return listID['tasks'];
+        return listID['tasks'].sort((objA, objB) => {
+            if (objA['id'] > objB['id']) {
+                return 1;
+            }
+            if (objA['id'] < objB['id']) {
+                return -1;
+            }
+            return 0;
+        });
     }
 }
 
@@ -65,13 +82,11 @@ function createTask(listID, lists) {
 
 function deleteTask(listID, taskID) {
     const curList = getID(database, listID);
-
     if (curList) {
         const curTask = getID(curList['tasks'], taskID);
-
         if (curTask) {
-            const delTask = database['tasks'].filter(i => i.id !== taskID);
-            return curList['tasks'] = delTask;
+            curList['tasks'].splice(curList['tasks'].indexOf(curTask), 1);
+            return true;
         }
     }
 }
@@ -85,15 +100,13 @@ function putTask(listID, taskID, lists) {
         const curTask = getID(curTasksInList, taskID);
         if (curTask) {
             const putCurTask = {
+                id: curTask['id'],
                 taskName: lists['taskName'],
-                done: false
+                done: lists['done']
             };
             Object.assign(curTask, putCurTask);
             return curTask;
         }
-        // or here
-        // Object.assign(curTask, putCurTask);
-        // return curTask;
     }
 }
 
@@ -101,10 +114,16 @@ function putTask(listID, taskID, lists) {
 
 function patchTask(listID, taskID, lists) {
     const curTasksInList = getID(database, listID)['tasks'];
+
     if (curTasksInList) {
         const curTask = getID(curTasksInList, taskID);
         if (curTask) {
-            Object.assign(curTask, lists);
+            const patchCurTask = {
+                id: curTask['id'],
+                taskName: lists['taskName'] || curTask['taskName'],
+                done: lists['done'] === "true" || curTask['done']
+            };
+            Object.assign(curTask, patchCurTask);
             return curTask;
         }
     }
@@ -114,7 +133,8 @@ function patchTask(listID, taskID, lists) {
 
 module.exports = {
     getID,
-    getTask,
+    getListIDWithTaskID,
+    getTaskByListId,
     getAllTasks,
     createTask,
     deleteTask,

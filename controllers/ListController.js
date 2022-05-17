@@ -7,37 +7,20 @@ class ListController {
     getAllLists() {
         return List.getAllLists();
     }
-    getTask(taskID) {
-        return getTask(taskID);
-    }
     getList(listID) {
-        return getList(listID);
+        return List.getList(listID);
     }
-
-    createTask(listID, lists) {
-        return createTask(listID, lists);
-    }
-    
     createList(lists) {
-        return createList(lists);
-    }
-
-    deleteTask(listID, taskID) {
-        return deleteTask(listID, taskID);
+        return List.createList(lists);
     }
     deleteList(listID) {
-        return deleteList(listID);
-    }
-
-    putTask(listID, taskID, lists) {
-        return putTask(listID, taskID, lists);
+        return List.deleteList(listID);
     }
     putList(listID, lists) {
-        return putList(listID, lists);
+        return List.putList(listID, lists);
     }
-
-    patchTask(listID, taskID, lists) {
-        return patchTask(listID, taskID, lists);
+    patchList(listID, lists) {
+        return List.patchList(listID, lists);
     }
 }
 
