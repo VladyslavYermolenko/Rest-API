@@ -40,7 +40,7 @@ router.post('/:id', (req, res) => { // http POST :3000/tasks/1 taskName="New Tas
 			}
 		}
 		else {
-			res.status(404).json('The body is incorrect.');
+			res.status(404).json('The query is incorrect.');
 		}
 	}
 	catch (err) {
@@ -66,7 +66,7 @@ router.delete('/', (req, res) => { // http DELETE :3000/tasks taskId=1
 			}
 		}
 		else {
-			res.status(404).json('The query is incorrect.');
+			res.status(404).json('The body is incorrect.');
 		}
 	}
 	catch (err) {
@@ -86,7 +86,7 @@ router.put('/', (req, res) => { // http PUT :3000/tasks?taskId=1 done=true // or
 				res.status(200).json(newTask);
 			}
 			else {
-				res.status(404).json('Failed to remove item from database.');
+				res.status(404).json('Failed to change item from database.');
 			}
 		}
 		else {
@@ -110,7 +110,7 @@ router.patch('/', (req, res) => { // http PATCH :3000/tasks?taskId=1 done=true /
 				res.status(200).json(newTask);
 			}
 			else {
-				res.status(404).json('Failed to remove item from database.');
+				res.status(404).json('Failed to change item from database.');
 			}
 		}
 		else {
