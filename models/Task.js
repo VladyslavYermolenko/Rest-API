@@ -1,145 +1,118 @@
-const database = require('../database/taskLists.json');
+const db = require('../database/');
 
 //////////////////////////////////////////////////////////////////////
 
-const increment = (init = getAllTasks().reduce((prev, cur) => prev['id'] > cur['id'] ? prev : cur['id'])) => () => ++init;
-const primaryKey = increment();
-
-//////////////////////////////////////////////////////////////////////
-
-function getID(arr, curID) {
-    return arr.find(i => i['id'] === curID);
-}
-
-function getListIDWithTaskID(taskID) {
-    try {
-        let listID = database.find(objList => objList['tasks']
-            .flat().find(objTask => objTask['id'] === taskID));
-        return listID['id'];
+class TaskModels {
+    async getAllTasks() {
+        const tasks = await db.query(
+            `SELECT * FROM tasksTable;`
+        );
+        return tasks;
     }
-    catch { TypeError } {
-        return undefined;
+    async getTask(id) {
+        const task = await db.query(
+            `SELECT * FROM tasksTable WHERE id = $1;`,
+            [id]
+        );
+        return task;
     }
-}
-
-//////////////////////////////////////////////////////////////////////
-
-function getAllTasks() {
-    let tasksList = [];
-
-    for (let i = 1; i < database.length + 1; i++) {
-        const listID = getID(database, i);
-        if (listID) {
-            tasksList.push(listID['tasks']);
+    async getTasksList(l_id, list) {
+        if(list) {
+            const allTasksList = await db.query(
+                `SELECT * FROM tasksTable WHERE l_id = $1;`,
+                [l_id]
+            );
+            if(allTasksList.rows[0]) {
+                return allTasksList.rows;
+            }
+        }
+        else {
+            const uncompletedTasks = await db.query(
+                `SELECT * FROM tasksTable WHERE l_id = $1 and done = $2;`,
+                [l_id, false]
+            );
+            if(uncompletedTasks.rows[0]) {
+                return uncompletedTasks.rows;
+            }
         }
     }
-    tasksList = tasksList.flat()
-        .sort((objA, objB) => {
-            if (objA['id'] > objB['id']) {
-                return 1;
-            }
-            if (objA['id'] < objB['id']) {
-                return -1;
-            }
-            return 0;
-        });
-    return tasksList;
-}
-
-function getTaskByListId(curID) {
-    const listID = getID(database, curID);
-    if (listID) {
-        return listID['tasks'].sort((objA, objB) => {
-            if (objA['id'] > objB['id']) {
-                return 1;
-            }
-            if (objA['id'] < objB['id']) {
-                return -1;
-            }
-            return 0;
-        });
+    async createTask(data, l_id) {
+        const newTask = await db.query(
+            `INSERT INTO tasksTable (taskName, done, datetime, l_id) 
+            VALUES ($1, $2, $3, $4) RETURNING *;`,
+            [
+                data.nameTask ? data.nameTask : "NULL",
+                date.done ? date.done : false,
+                date.datetime ? date.datetime : new Date(),
+                l_id
+            ]
+        );
+        return task.rows[0];
     }
-}
-
-//////////////////////////////////////////////////////////////////////
-
-function createTask(listID, lists) {
-    const curList = getID(database, listID);
-
-    const newTask = {
-        id: primaryKey(),
-        taskName: lists['taskName'],
-        done: false
-    };
-
-    if (curList) {
-        curList['tasks'].push(newTask);
-        return curList['tasks'];
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-
-function deleteTask(listID, taskID) {
-    const curList = getID(database, listID);
-    if (curList) {
-        const curTask = getID(curList['tasks'], taskID);
-        if (curTask) {
-            curList['tasks'].splice(curList['tasks'].indexOf(curTask), 1);
+    async deleteTask(id, l_id) {
+        const findTask = await db.query(
+            `SELECT * FROM tasksTable WHERE id = $1 and l_id = $2;`,
+            [id, l_id]
+        );
+        if(findTask.rows[0]) {
+            await db.query(
+                `DELETE FROM tasksTable WHERE id $1 and l_id = $2;`,
+                [id, l_id]
+            );
             return true;
         }
     }
-}
+    async putTask(id, l_id, data) {
+        const selectTask = await db.query(
+            `SELECT * FROM tasksTable WHERE id = $1 and l_id = $2;`,
+            [id, l_id]
+        );
+        if(selectTask.rows[0]) {
+            await db.query(
+                `UPDATE tasksTable SET taskName = $2, done = $3, datetime = $4, l_id = $5 WHERE id = $1 RETURNING *;`,
+                [
+                    id, 
+                    data.taskName ?? "NULL",
+                    date.done ?? false,
+                    date.datetime ?? new Date(),
+                    l_id
+                ]
+            );
+            const newTask = await db.query(
+                `SELECT * tasksTable FROM taskName WHERE id = $1;`,
+                [id]
+            );
+            return newTask.rows[0];
+        }
+    }
 
-//////////////////////////////////////////////////////////////////////
-
-function putTask(listID, taskID, lists) {
-    const curTasksInList = getID(database, listID)['tasks'];
-
-    if (curTasksInList) {
-        const curTask = getID(curTasksInList, taskID);
-        if (curTask) {
-            const putCurTask = {
-                id: curTask['id'],
-                taskName: lists['taskName'],
-                done: lists['done']
-            };
-            Object.assign(curTask, putCurTask);
-            return curTask;
+    async patchTask(id, l_id, data) {
+        const oldTask = await db.query(
+            `SELECT * FROM tasksTable WHERE id = $1 and l_id = $2;`,
+            [id, l_id]
+        );
+        if(oldTask.rows[0]) {
+            await db.query(
+                `UPDATE tasksTable SET taskName = $2, done = $3, datetime = $4, l_id = $5 WHERE id = $1 RETURNING *;`,
+                [
+                    id, 
+                    data.taskName ?? oldTask.taskName,
+                    date.done ?? oldTask.done,
+                    date.datetime ?? oldTask.datetime,
+                    l_id
+                ]
+            );
+            const newTask = await db.query(
+                `SELECT * tasksTable FROM taskName WHERE id = $1;`,
+                [id]
+            );
+            return newTask.rows[0];
         }
     }
 }
 
 //////////////////////////////////////////////////////////////////////
 
-function patchTask(listID, taskID, lists) {
-    const curTasksInList = getID(database, listID)['tasks'];
-
-    if (curTasksInList) {
-        const curTask = getID(curTasksInList, taskID);
-        if (curTask) {
-            const patchCurTask = {
-                id: curTask['id'],
-                taskName: lists['taskName'] || curTask['taskName'],
-                done: lists['done'] === "true" || curTask['done']
-            };
-            Object.assign(curTask, patchCurTask);
-            return curTask;
-        }
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-
-module.exports = {
-    getID,
-    getListIDWithTaskID,
-    getTaskByListId,
-    getAllTasks,
-    createTask,
-    deleteTask,
-    putTask,
-    patchTask
-};
+module.exports = TaskModels();
 
 // done
