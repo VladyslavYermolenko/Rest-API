@@ -16,8 +16,8 @@ class TaskModels {
         );
         return task;
     }
-    async getTasksList(l_id, list) {
-        if(list) {
+    async getTasksList(l_id, query) {
+        if(query) {
             const allTasksList = await db.query(
                 `SELECT * FROM tasksTable WHERE l_id = $1;`,
                 [l_id]
@@ -41,13 +41,13 @@ class TaskModels {
             `INSERT INTO tasksTable (taskName, done, datetime, l_id) 
             VALUES ($1, $2, $3, $4) RETURNING *;`,
             [
-                data.nameTask ? data.nameTask : "NULL",
-                date.done ? date.done : false,
-                date.datetime ? date.datetime : new Date(),
+                data.taskName ?? "NULL",
+                date.done ?? false,
+                date.datetime ?? new Date(),
                 l_id
             ]
         );
-        return task.rows[0];
+        return newTask.rows[0];
     }
     async deleteTask(id, l_id) {
         const findTask = await db.query(
@@ -56,7 +56,7 @@ class TaskModels {
         );
         if(findTask.rows[0]) {
             await db.query(
-                `DELETE FROM tasksTable WHERE id $1 and l_id = $2;`,
+                `DELETE FROM tasksTable WHERE id = $1 and l_id = $2;`,
                 [id, l_id]
             );
             return true;
@@ -113,6 +113,6 @@ class TaskModels {
 
 //////////////////////////////////////////////////////////////////////
 
-module.exports = TaskModels();
+module.exports = new TaskModels();
 
 // done

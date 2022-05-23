@@ -6,7 +6,7 @@ router.get('/', (req, res) => { // http :3000/tasks // or // http :3000/tasks?li
 		const params = req.query['listId'];
 
 		if (params) {
-			let task = controller.getTaskByListId(Number(params));
+			let task = controller.get(Number(params));
 			if (task) {
 				res.status(200).json(task);
 			}
