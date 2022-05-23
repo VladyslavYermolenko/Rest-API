@@ -6,6 +6,8 @@ const lists = require('./lists');
 
 router.use('/tasks', tasks);
 router.use('/lists', lists);
+router.use('/dashboard', dashboard);
+router.use('/collection', collection);
 
 router.get('/', (_, res) => {
     res.status(301).redirect('/lists');

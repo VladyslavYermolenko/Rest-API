@@ -1,31 +1,8 @@
 const router = require('express').Router();
 const controller = require('../controllers/TaskController');
 
-router.get('/', (req, res) => { // http :3000/tasks // or // http :3000/tasks?listId=1
-	try {
-		const params = req.query['listId'];
-
-		if (params) {
-			let task = controller.get(Number(params));
-			if (task) {
-				res.status(200).json(task);
-			}
-			else if (params.search((/^[0-9]{1,}$/g) || null) === null) {
-				res.status(404).json('Incorrect ID task input!');
-			}
-			else {
-				res.status(404).json('Task not found!');
-			}
-		}
-		else {
-			res.json(controller.getAllTasks());
-		}
-	}
-	catch (err) {
-		res.status(404).json('Error.');
-		console.error(err);
-	}
-});
+router.get('/', controller.getAllTasks);
+router.get('/:id', controller.getTask);
 
 router.post('/:id', (req, res) => { // http POST :3000/tasks/1 taskName="New Task"
 	try {

@@ -6,7 +6,7 @@ class TaskController {
         res.status(200).json(task);
     }
     async getTask(req, res) {
-        const {l_id: listId, id} = req.params;
+        const {listId, id} = req.params;
         const task = await TaskModels.getTask(id, listId);
         if (task) {
             res.status(200).json(task);

@@ -25,7 +25,7 @@ class ListModels {
         }
         return list.rows[0];
     }
-    async createTask(listName) {
+    async createList(listName) {
         const newList = await db.query(
             `INSERT INTO listsTable (listName) 
             VALUES ($1) RETURNING *;`,
@@ -33,7 +33,7 @@ class ListModels {
         );
         return newList.rows[0];
     }
-    async deleteTask(listId) {
+    async deleteList(listId) {
         const findTask = await db.query(
             `SELECT * FROM listsTable WHERE listId = $1;`,
             [listId]
@@ -50,7 +50,7 @@ class ListModels {
             return true;
         }
     }
-    async putTask(listId, listName) {
+    async putList(listId, listName) {
         const findTask = await db.query(
             `SELECT * FROM listsTable WHERE listId = $1;`,
             [listId]
@@ -67,12 +67,12 @@ class ListModels {
             const newTask =  await db.query(
                 `INSERT INTO listsTable (listName) 
                 VALUES ($1) RETURNING *;`, 
-                [listId]
+                [listName]
             );
             return newTask.rows[0];
         }
     }
-    async patchTask(listId, listName) {
+    async patchList(listId, listName) {
         const oldList = await db.query(
             `SELECT * FROM listsTable WHERE listId = $1;`,
             [listId]
