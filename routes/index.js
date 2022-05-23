@@ -4,8 +4,8 @@ const router = express.Router();
 const tasks = require('./tasks');
 const lists = require('./lists');
 
-router.use('/tasks', tasks);
 router.use('/lists', lists);
+router.use('/', tasks);
 router.use('/dashboard', dashboard);
 router.use('/collection', collection);
 
