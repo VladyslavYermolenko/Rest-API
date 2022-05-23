@@ -1,4 +1,4 @@
-const db = require('../database/');
+const db = require('../database');
 
 //////////////////////////////////////////////////////////////////////
 
@@ -9,15 +9,15 @@ class ListModels {
         );
         return lists.rows;
     }
-    async getList(l_id) {
+    async getList(listId) {
         const list = await db.query(
-            `SELECT * FROM listsTable WHERE l_id = $1;`,
-            [l_id]
+            `SELECT * FROM listsTable WHERE listId = $1;`,
+            [listId]
         );
         if(list.rows[0]) {
             const task = await db.query(
-                `SELECT * FROM tasksTable WHERE l_id = $1;`,
-                [l_id]
+                `SELECT * FROM tasksTable WHERE listId = $1;`,
+                [listId]
             );
             if (task.rows[0]) {
                 return task.rows;
@@ -33,54 +33,54 @@ class ListModels {
         );
         return newList.rows[0];
     }
-    async deleteTask(l_id) {
+    async deleteTask(listId) {
         const findTask = await db.query(
-            `SELECT * FROM listsTable WHERE l_id = $1;`,
-            [l_id]
+            `SELECT * FROM listsTable WHERE listId = $1;`,
+            [listId]
         );
         if(findTask.rows[0]) {
             await db.query(
-                `DELETE FROM tasksTable WHERE l_id = $1;`,
-                [l_id]
+                `DELETE FROM tasksTable WHERE listId = $1;`,
+                [listId]
             );
             await db.query(
-                `DELETE FROM listsTable WHERE l_id = $1;`,
-                [l_id]
+                `DELETE FROM listsTable WHERE listId = $1;`,
+                [listId]
             );
             return true;
         }
     }
-    async putTask(l_id, listName) {
+    async putTask(listId, listName) {
         const findTask = await db.query(
-            `SELECT * FROM listsTable WHERE l_id = $1;`,
-            [l_id]
+            `SELECT * FROM listsTable WHERE listId = $1;`,
+            [listId]
         );
         if(findTask.rows[0]) {
             await db.query(
-                `DELETE FROM tasksTable WHERE l_id = $1;`,
-                [l_id]
+                `DELETE FROM tasksTable WHERE listId = $1;`,
+                [listId]
             );
             await db.query(
-                `DELETE FROM listsTable WHERE l_id = $1;`,
-                [l_id]
+                `DELETE FROM listsTable WHERE listId = $1;`,
+                [listId]
             );
             const newTask =  await db.query(
                 `INSERT INTO listsTable (listName) 
                 VALUES ($1) RETURNING *;`, 
-                [l_id]
+                [listId]
             );
             return newTask.rows[0];
         }
     }
-    async patchTask(l_id, listName) {
+    async patchTask(listId, listName) {
         const oldList = await db.query(
-            `SELECT * FROM listsTable WHERE l_id = $1;`,
-            [l_id]
+            `SELECT * FROM listsTable WHERE listId = $1;`,
+            [listId]
         );
         if(oldList.rows[0]) {
             await db.query(
                 `UPDATE listsTable SET listName = $2 WHERE id = $1 RETURNING *;`,
-                [l_id, listName]
+                [listId, listName]
             );
             const newTask = await db.query(
                 `SELECT * listsTable FROM taskName WHERE id = $1;`,

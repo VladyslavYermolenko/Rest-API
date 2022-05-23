@@ -1,4 +1,4 @@
-const db = require('../database/');
+const db = require('../database');
 
 //////////////////////////////////////////////////////////////////////
 
@@ -14,13 +14,20 @@ class TaskModels {
             `SELECT * FROM tasksTable WHERE id = $1;`,
             [id]
         );
-        return task;
+        return task.rows[0];
     }
-    async getTasksList(l_id, query) {
+    async getTasksId(id, listId) {
+        const task = await db.query(
+            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
+            [id, listId]
+        );
+        return task.rows[0];
+    }
+    async getTasksList(listId, query) {
         if(query) {
             const allTasksList = await db.query(
-                `SELECT * FROM tasksTable WHERE l_id = $1;`,
-                [l_id]
+                `SELECT * FROM tasksTable WHERE listId = $1;`,
+                [listId]
             );
             if(allTasksList.rows[0]) {
                 return allTasksList.rows;
@@ -28,44 +35,44 @@ class TaskModels {
         }
         else {
             const uncompletedTasks = await db.query(
-                `SELECT * FROM tasksTable WHERE l_id = $1 and done = $2;`,
-                [l_id, false]
+                `SELECT * FROM tasksTable WHERE listId = $1 and done = $2;`,
+                [listId, false]
             );
             if(uncompletedTasks.rows[0]) {
                 return uncompletedTasks.rows;
             }
         }
     }
-    async createTask(data, l_id) {
+    async createTask(data, listId) {
         const newTask = await db.query(
-            `INSERT INTO tasksTable (taskName, done, datetime, l_id) 
+            `INSERT INTO tasksTable (taskName, done, datetime, listId) 
             VALUES ($1, $2, $3, $4) RETURNING *;`,
             [
                 data.taskName ?? "NULL",
                 date.done ?? false,
                 date.datetime ?? new Date(),
-                l_id
+                listId
             ]
         );
         return newTask.rows[0];
     }
-    async deleteTask(id, l_id) {
+    async deleteTask(id, listId) {
         const findTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and l_id = $2;`,
-            [id, l_id]
+            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
+            [id, listId]
         );
         if(findTask.rows[0]) {
             await db.query(
-                `DELETE FROM tasksTable WHERE id = $1 and l_id = $2;`,
-                [id, l_id]
+                `DELETE FROM tasksTable WHERE id = $1 and listId = $2;`,
+                [id, listId]
             );
             return true;
         }
     }
-    async putTask(id, l_id, data) {
+    async putTask(id, listId, data) {
         const selectTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and l_id = $2;`,
-            [id, l_id]
+            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
+            [id, listId]
         );
         if(selectTask.rows[0]) {
             await db.query(
@@ -75,7 +82,7 @@ class TaskModels {
                     data.taskName ?? "NULL",
                     date.done ?? false,
                     date.datetime ?? new Date(),
-                    l_id
+                    listId
                 ]
             );
             const newTask = await db.query(
@@ -86,10 +93,10 @@ class TaskModels {
         }
     }
 
-    async patchTask(id, l_id, data) {
+    async patchTask(id, listId, data) {
         const oldTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and l_id = $2;`,
-            [id, l_id]
+            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
+            [id, listId]
         );
         if(oldTask.rows[0]) {
             await db.query(
@@ -99,7 +106,7 @@ class TaskModels {
                     data.taskName ?? oldTask.taskName,
                     date.done ?? oldTask.done,
                     date.datetime ?? oldTask.datetime,
-                    l_id
+                    listId
                 ]
             );
             const newTask = await db.query(

@@ -1,4 +1,4 @@
-const List = require('../models/List')
+const ListModels = require('../models/ListModels')
 
 class ListController {
     
