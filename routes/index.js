@@ -3,11 +3,11 @@ const router = express.Router();
 
 const tasks = require('./tasks');
 const lists = require('./lists');
+const another = require('./another');
 
 router.use('/lists', lists);
 router.use('/', tasks);
-router.use('/dashboard', dashboard);
-router.use('/collection', collection);
+router.use('/', another);
 
 router.get('/', (_, res) => {
     res.status(301).redirect('/lists');
