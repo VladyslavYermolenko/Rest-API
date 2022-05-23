@@ -7,7 +7,7 @@ CREATE TABLE tasksTable (
     id        SERIAL PRIMARY KEY, 
     taskName  varchar not null, 
     done      boolean default false,
-    datetime  date, 
+    datetime  date default CURRENT_DATE, 
     listId    int REFERENCES listsTable
 );
 
