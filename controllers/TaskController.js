@@ -28,7 +28,7 @@ class TaskController {
     }
     async getTasksList(req, res) {
         const { listId } = req.params;
-        const { query } = req.query;
+        const query = req.query['all'];
         const task = TaskModels.getTasksList(listId, query);
         if (task) {
             res.status(200).json(task);

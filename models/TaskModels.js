@@ -24,7 +24,7 @@ class TaskModels {
         return task.rows[0];
     }
     async getTasksList(listId, query) {
-        if(query) {
+        if(query) { // ?all=true
             const allTasksList = await db.query(
                 `SELECT * FROM tasksTable WHERE listId = $1;`,
                 [listId]
@@ -50,7 +50,7 @@ class TaskModels {
             [
                 data.taskName ?? "NULL",
                 date.done ?? false,
-                date.datetime ?? new Date(),
+                date.datetime ?? new Date().toLocaleDateString('sv'),
                 listId
             ]
         );

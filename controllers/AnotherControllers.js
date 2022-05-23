@@ -1,8 +1,8 @@
-const anotherModels = require('../models/AnotherModels')
+const AnotherModels = require('../models/AnotherModels')
 
-class AnotherControllers {Another
+class AnotherControllers {
     async dashboard(_, res) {
-        const task = await anotherModels.dashboard();
+        const task = await AnotherModels.dashboard();
         if (task) {
             res.status(200).json(task);
         }
@@ -11,7 +11,7 @@ class AnotherControllers {Another
         }
     }
     async collection(_, res) {
-        const task = await anotherModels.collection();
+        const task = await AnotherModels.collection();
         if (task) {
             res.status(200).json(task);
         }
