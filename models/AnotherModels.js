@@ -9,11 +9,11 @@ class AnotherModels {
             BETWEEN (CURRENT_DATE) and (CURRENT_DATE);`
         );
         const task = await db.query(
-            `SELECT listsTable.listId, listsTable.listName, count(tasksTable.done) 
-            FROM tasksTable RIGHT JOIN listsTable 
-            ON tasksTable.listId = listsTable.listId
+            `SELECT listsTable.listId, listsTable.listName, count(tasksTable.done) as unfulfilled_task_count
+            FROM tasksTable RIGHT JOIN listsTable
+            ON tasksTable.listId = listsTable.listId and tasksTable.done = false OR tasksTable.done = null
             GROUP BY listsTable.listId
-            HAVING tasksTable.done = false OR tasksTable.done = null;`
+            ORDER BY listsTable.listId;`
         );
     }
 }
