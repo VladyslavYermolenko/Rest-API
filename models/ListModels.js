@@ -1,7 +1,5 @@
 const db = require('../database');
 
-//////////////////////////////////////////////////////////////////////
-
 class ListModels {
     async getAllLists() {
         const lists = await db.query(
@@ -91,8 +89,6 @@ class ListModels {
         }
     }
 }
-
-//////////////////////////////////////////////////////////////////////
 
 module.exports = new ListModels();
 

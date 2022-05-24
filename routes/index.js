@@ -4,22 +4,14 @@ const listController = require('../controllers/ListController');
 const taskController = require('../controllers/TaskController');
 const anotherController = require('../controllers/AnotherControllers');
 
-// const tasks = require('./tasks');
-// const lists = require('./lists');
-// const another = require('./another');
-
-// router.use('', lists);
-// router.use('/', tasks);
-// router.use('/', another);
-
 router.get('/', (_, res) => {
     res.status(301).redirect('/lists');
 });
 
 //////////////////////////////////////////////////////////////////////
 
-router.get('/lists', listController.getAllLists);     // http :3000/lists
-router.get('/lists/:listId', listController.getList); // http :3000/lists/2
+router.get('/lists', listController.getAllLists);
+router.get('/lists/:listId', listController.getList);
 
 router.post('/lists', listController.createList);
 
@@ -56,5 +48,3 @@ router.use(function (_, res, next) {
 });
 
 module.exports = router;
-
-// done

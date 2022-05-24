@@ -1,7 +1,5 @@
 const db = require('../database');
 
-//////////////////////////////////////////////////////////////////////
-
 class TaskModels {
     async getAllTasks() {
         const tasks = await db.query(
@@ -118,8 +116,4 @@ class TaskModels {
     }
 }
 
-//////////////////////////////////////////////////////////////////////
-
 module.exports = new TaskModels();
-
-// done

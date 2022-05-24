@@ -60,5 +60,3 @@ class ListController {
 }
 
 module.exports = new ListController();
-
-// done

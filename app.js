@@ -12,5 +12,3 @@ app.use(logRequest);
 app.use(router);
 
 module.exports = app;
-
-// done
