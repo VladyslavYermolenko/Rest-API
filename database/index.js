@@ -5,7 +5,7 @@ const pool = new Pool({
     port: 5432,
     user: 'todolist_app',
     password: 'secret',
-    database: 'taskListsDB',
+    database: 'tasklistsdb',
     
     max: 10,
     idleTimeoutMillis: 30000,

@@ -15,7 +15,7 @@ class ListController {
             res.status(404).send('Not Found!');
         }
     }
-    async createTask(req, res) {
+    async createList(req, res) {
         const listName = req.body['listName'];
         const newList = await ListModels.createList(listName);
         if (newList) {
@@ -25,9 +25,9 @@ class ListController {
             res.status(404).send('Not Found!');
         }
     }
-    async deleteTask(req, res) {
+    async deleteList(req, res) {
         const listId = req.params['listId'];
-        const isDelete = await ListModels.deleteList(id, listId);
+        const isDelete = await ListModels.deleteList(listId);
         if (isDelete) {
             res.status(204).send();
         }
@@ -35,10 +35,10 @@ class ListController {
             res.status(404).send('Not Found!');
         }
     }
-    async putTask(req, res) {
+    async putList(req, res) {
         const listId = req.params['listId'];
         const listName = req.body['listName'];
-        const newTask = ListModels.putList(listId, listName);
+        const newTask = await ListModels.putList(listId, listName);
         if (newTask) {
             res.status(200).json(newTask);
         }
@@ -46,10 +46,10 @@ class ListController {
             res.status(404).send('Not Found!');
         }
     }
-    async patchTask(req, res) {
+    async patchList(req, res) {
         const listId = req.params['listId'];
         const listName = req.body['listName'];
-        const newTask = ListModels.patchList(listId, listName);
+        const newTask = await ListModels.patchList(listId, listName);
         if (newTask) {
             res.status(200).json(newTask);
         }

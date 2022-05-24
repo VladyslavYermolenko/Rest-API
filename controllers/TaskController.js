@@ -6,8 +6,19 @@ class TaskController {
         res.status(200).json(task);
     }
     async getTask(req, res) {
-        const {listId, id} = req.params;
-        const task = await TaskModels.getTask(id, listId);
+        const {listId} = req.params;
+        const task = await TaskModels.getTask(listId);
+        if (task) {
+            res.status(200).json(task);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
+    }
+    async getTasksList(req, res) {
+        const listId = Number(req.params['listId']);
+        const query = req.query['all'] ?? false;
+        const task = await TaskModels.getTasksList(listId, query);
         if (task) {
             res.status(200).json(task);
         }
@@ -19,17 +30,6 @@ class TaskController {
         const id = req.params['id'];
         const listId = req.params['listId'];
         const task = await TaskModels.getTasksId(id, listId);
-        if (task) {
-            res.status(200).json(task);
-        }
-        else {
-            res.status(404).send('Not Found!');
-        }
-    }
-    async getTasksList(req, res) {
-        const { listId } = req.params;
-        const query = req.query['all'];
-        const task = TaskModels.getTasksList(listId, query);
         if (task) {
             res.status(200).json(task);
         }
@@ -63,7 +63,7 @@ class TaskController {
         const id = req.params['id'];
         const listId = req.params['listId'];
         const data = req.body;
-        const newTask = TaskModels.putTask(id, listId, data);
+        const newTask = await TaskModels.putTask(id, listId, data);
         if (newTask) {
             res.status(200).json(newTask);
         }
@@ -75,7 +75,7 @@ class TaskController {
         const id = req.params['id'];
         const listId = req.params['listId'];
         const data = req.body;
-        const newTask = TaskModels.patchTask(id, listId, data);
+        const newTask = await TaskModels.patchTask(id, listId, data);
         if (newTask) {
             res.status(200).json(newTask);
         }
