@@ -1,117 +1,70 @@
-const db = require('../database');
+const knex = require('../database');
 
 class TaskModels {
     async getAllTasks() {
-        const tasks = await db.query(
-            `SELECT * FROM tasksTable;`
-        );
-        return tasks.rows;
+        return knex.select(`*`).from(`taskstable`);
     }
-    async getTask(listId) {
-        const task = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1;`,
-            [listId]
-        );
-        return task.rows[0];
+    async getTask(id) {
+        return await knex.select(`*`).from(`taskstable`).where("id", id)[0]
     }
     async getTasksList(listId, query) {
         if(query) { // ?all=true
-            const allTasksList = await db.query(
-                `SELECT * FROM tasksTable WHERE listId = $1;`,
-                [listId]
-            );
-            if(allTasksList.rows[0]) {
-                return allTasksList.rows;
+            const allTasksList = await knex.select(`*`).from(`taskstable`).where("listid", listId);
+            if(allTasksList[0]) {
+                return allTasksList;
             }
         }
         else {
-            const uncompletedTasks = await db.query(
-                `SELECT * FROM tasksTable WHERE listId = $1 and done = false;`,
-                [listId]
-            );
-            if(uncompletedTasks.rows[0]) {
-                return uncompletedTasks.rows;
+            const uncompletedTasks = await knex.select(`*`).from(`taskstable`).where("listid", listId).andWhere("done", false);
+            if(uncompletedTasks[0]) {
+                return uncompletedTasks;
             }
         }
     }
     async getTasksId(id, listId) {
-        const task = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
-            [id, listId]
-        );
-        return task.rows[0];
+        return await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId)[0];
     }
     async createTask(data, listId) {
-        const newTask = await db.query(
-            `INSERT INTO tasksTable (taskName, done, datetime, listId) 
-            VALUES ($1, $2, $3, $4) RETURNING *;`,
-            [
-                data.taskName ?? "NULL",
-                data.done ?? false,
-                data.datetime ?? new Date().toLocaleDateString('sv'),
-                listId
-            ]
-        );
-        return newTask.rows[0];
+        const newTask = await knex('taskstable').insert({
+            taskName: data.taskName ?? "NULL",
+            done: data.done ?? false,
+            datetime: data.datetime ?? new Date().toLocaleDateString('sv'),
+            listId: listId
+        }).returning('*').toString();
+        return newTask[0];
     }
-    async deleteTask(id, listId) {
-        const findTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
-            [id, listId]
-        );
-        if(findTask.rows[0]) {
-            await db.query(
-                `DELETE FROM tasksTable WHERE id = $1 and listId = $2;`,
-                [id, listId]
-            );
+    async deleteTask(id, listId) { 
+        const findTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
+        if(findTask[0]) {
+            knex('taskstable').where("id", id).andWhere("listid", listId).del();
             return true;
         }
     }
     async putTask(id, listId, data) {
-        const selectTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
-            [id, listId]
-        );
-        if(selectTask.rows[0]) {
-            await db.query(
-                `UPDATE tasksTable SET taskName = $2, done = $3, datetime = $4, listId = $5 WHERE id = $1 RETURNING *;`,
-                [
-                    id, 
-                    data.taskName ?? "NULL",
-                    data.done ?? false,
-                    data.datetime ?? new Date().toLocaleDateString('sv'),
-                    listId
-                ]
-            );
-            const newTask = await db.query(
-                `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
-                [id, listId]
-            );
-            return newTask.rows[0];
+        const selectTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
+        if(selectTask[0]) {
+            await knex('taskstable').update({
+                taskName: data.taskName ?? "NULL",
+                done: data.done ?? false,
+                datetime: data.datetime ?? new Date().toLocaleDateString('sv'),
+                listId: listId
+            }).where('id', id);
+            const newTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
+            return newTask[0];
         }
     }
 
     async patchTask(id, listId, data) {
-        const oldTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
-            [id, listId]
-        );
-        if(oldTask.rows[0]) {
-            await db.query(
-                `UPDATE tasksTable SET taskName = $2, done = $3, datetime = $4, listId = $5 WHERE id = $1 RETURNING *;`,
-                [
-                    id, 
-                    data.taskName ?? oldTask.taskName,
-                    data.done ?? oldTask.done,
-                    data.datetime ?? oldTask.datetime,
-                    listId
-                ]
-            );
-            const newTask = await db.query(
-                `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
-                [id, listId]
-            );
-            return newTask.rows[0];
+        const selectTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
+        if(selectTask[0]) {
+            await knex('taskstable').update({
+                taskName: data.taskName ?? oldTask.taskName,
+                done: data.done ?? oldTask.done,
+                datetime: data.datetime ?? oldTask.datetime,
+                listId: listId
+            }).where('id', id);
+            const newTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
+            return newTask[0];
         }
     }
 }

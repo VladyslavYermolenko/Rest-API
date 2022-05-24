@@ -2,41 +2,36 @@ const db = require('../database')
 
 class AnotherModels {
     async dashboard() {
-        const countTasks = await db.query(
-            `SELECT CAST(count(*) as int)
-            FROM tasksTable 
-            WHERE done = false and datetime 
-            BETWEEN (CURRENT_DATE) and (CURRENT_DATE);`
-        );
-        const tasks = await db.query(
-            `SELECT listsTable.listId, 
-                    listsTable.listName, 
-                    CAST(count(tasksTable.done) as int) as unfulfilled_task_count
-            FROM tasksTable RIGHT JOIN listsTable
-            ON tasksTable.listId = listsTable.listId AND 
-            tasksTable.done = false OR tasksTable.done = null
-            GROUP BY listsTable.listId
-            ORDER BY listsTable.listId;`
-        );
+        const countTasks = await knex.select(knex.raw(`count(*)::int`),)
+                                    .from(`taskstable`)
+                                    .where("done", false)
+                                    .andWhereBetween("datetime", [knex.raw('CURRENT_DATE'), knex.raw('CURRENT_DATE')]);
+        const tasks = await knex.select(`liststable.listid`, `liststable.listname`, 
+                            knex.raw(`count(taskstable.done)::int AS unfulfilled_task_count`))
+                            .from(`taskstable`)
+                            .rightOuterJoin(`liststable`, function() {
+                                this.on("taskstable.listid", "liststable.listid")
+                                .andOn("taskstable.done", false).orOn("taskstable.done", "NULL")
+                            }).groupByRaw(`liststable.listid`).orderByRaw(`liststable.listid`);
         return {
             count: countTasks.rows[0],
             tasks: tasks.rows
         }
     }
     async collection() {
-        const task =  await db.query(
-            `SELECT tasksTable.listId,
-                    listsTable.listName,
-                    tasksTable.id as taskid,
-                    tasksTable.taskName, 
-                    tasksTable.done,
-                    tasksTable.datetime
-            FROM listsTable INNER JOIN tasksTable
-            ON tasksTable.listId = listsTable.listId AND 
-            datetime BETWEEN (CURRENT_DATE) AND (datetime)
-            GROUP BY listsTable.listName, tasksTable.id;`
-        );
-        return task.rows;
+        const task =  await knex.select(
+            `taskstable.listid`, 
+            `liststable.listname`, 
+            `taskstable.id AS taskid`, 
+            `taskstable.taskname`, 
+            `taskstable.done`, 
+            `taskstable.datetime`, 
+        ).from(`liststable`)
+        .innerJoin(`taskstable`, function() {
+            this.on("taskstable.listid","=","liststable.listid")
+            .andOnBetween("datetime", [knex.raw('CURRENT_DATE'), knex.raw('datetime')])
+        }).groupByRaw(`liststable.listname, taskstable.id`);
+        return task;
     }
 }
 
