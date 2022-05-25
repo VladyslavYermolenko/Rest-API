@@ -5,38 +5,39 @@ class TaskModels {
         return knex.select(`*`).from(`taskstable`);
     }
     async getTask(id) {
-        return await knex.select(`*`).from(`taskstable`).where("id", id)[0]
+        const task = await knex.select(`*`).from(`taskstable`).where("id", id);
+        console.log(task[0]);
+        return task[0];
     }
     async getTasksList(listId, query) {
         if(query) { // ?all=true
             const allTasksList = await knex.select(`*`).from(`taskstable`).where("listid", listId);
-            if(allTasksList[0]) {
-                return allTasksList;
-            }
+            console.log(allTasksList);
+            if(allTasksList[0]) return allTasksList;
         }
         else {
             const uncompletedTasks = await knex.select(`*`).from(`taskstable`).where("listid", listId).andWhere("done", false);
-            if(uncompletedTasks[0]) {
-                return uncompletedTasks;
-            }
+            if(uncompletedTasks[0]) return uncompletedTasks;
         }
     }
     async getTasksId(id, listId) {
-        return await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId)[0];
+        const task = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
+        return task[0];
     }
     async createTask(data, listId) {
         const newTask = await knex('taskstable').insert({
-            taskName: data.taskName ?? "NULL",
+            taskname: data.taskName ?? "NULL",
             done: data.done ?? false,
             datetime: data.datetime ?? new Date().toLocaleDateString('sv'),
-            listId: listId
-        }).returning('*').toString();
+            listid: listId
+        }).returning('*');
+        console.log(newTask);
         return newTask[0];
     }
     async deleteTask(id, listId) { 
         const findTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
         if(findTask[0]) {
-            knex('taskstable').where("id", id).andWhere("listid", listId).del();
+            await knex('taskstable').where("id", id).andWhere("listid", listId).del();
             return true;
         }
     }
@@ -44,10 +45,10 @@ class TaskModels {
         const selectTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
         if(selectTask[0]) {
             await knex('taskstable').update({
-                taskName: data.taskName ?? "NULL",
+                taskname: data.taskName ?? "NULL",
                 done: data.done ?? false,
                 datetime: data.datetime ?? new Date().toLocaleDateString('sv'),
-                listId: listId
+                listid: listId
             }).where('id', id);
             const newTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
             return newTask[0];
@@ -58,10 +59,10 @@ class TaskModels {
         const selectTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
         if(selectTask[0]) {
             await knex('taskstable').update({
-                taskName: data.taskName ?? oldTask.taskName,
+                taskname: data.taskName ?? oldTask.taskName,
                 done: data.done ?? oldTask.done,
                 datetime: data.datetime ?? oldTask.datetime,
-                listId: listId
+                listid: listId
             }).where('id', id);
             const newTask = await knex.select(`*`).from(`taskstable`).where("id", id).andWhere("listid", listId);
             return newTask[0];
