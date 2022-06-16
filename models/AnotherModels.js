@@ -5,7 +5,7 @@ class AnotherModels {
         const countTasks = await db.query(
             `SELECT CAST(count(*) as int)
             FROM tasksTable 
-            WHERE done = false and datetime 
+            WHERE done = false and duedate 
             BETWEEN (CURRENT_DATE) and (CURRENT_DATE);`
         );
         const tasks = await db.query(
@@ -26,14 +26,14 @@ class AnotherModels {
     async collection() {
         const task =  await db.query(
             `SELECT tasksTable.listId,
-                    listsTable.listName,
-                    tasksTable.id as taskid,
+                    tasksTable.id as taskId,
                     tasksTable.taskName, 
+                    tasksTable.taskDescription,
                     tasksTable.done,
-                    tasksTable.datetime
+                    tasksTable.duedate
             FROM listsTable INNER JOIN tasksTable
             ON tasksTable.listId = listsTable.listId AND 
-            datetime BETWEEN (CURRENT_DATE) AND (datetime)
+            duedate BETWEEN (CURRENT_DATE) AND (duedate)
             GROUP BY listsTable.listName, tasksTable.id;`
         );
         return task.rows;

@@ -43,12 +43,13 @@ class TaskModels {
     }
     async createTask(data, listId) {
         const newTask = await db.query(
-            `INSERT INTO tasksTable (taskName, done, datetime, listId) 
-            VALUES ($1, $2, $3, $4) RETURNING *;`,
+            `INSERT INTO tasksTable (taskName, taskDescription, done, duedate, listId) 
+            VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
             [
                 data.taskName ?? "NULL",
+                data.taskDescription ?? "NULL",
                 data.done ?? false,
-                data.datetime ?? new Date().toLocaleDateString('sv'),
+                data.duedate ?? new Date().toLocaleDateString('sv'),
                 listId
             ]
         );
@@ -74,12 +75,13 @@ class TaskModels {
         );
         if(selectTask.rows[0]) {
             await db.query(
-                `UPDATE tasksTable SET taskName = $2, done = $3, datetime = $4, listId = $5 WHERE id = $1 RETURNING *;`,
+                `UPDATE tasksTable SET taskName = $2, taskDescription = $3, done = $4, duedate = $5, listId = $6 WHERE id = $1 RETURNING *;`,
                 [
                     id, 
                     data.taskName ?? "NULL",
+                    data.taskDescription ?? "NULL",
                     data.done ?? false,
-                    data.datetime ?? new Date().toLocaleDateString('sv'),
+                    data.duedate ?? new Date().toLocaleDateString('sv'),
                     listId
                 ]
             );
@@ -98,12 +100,13 @@ class TaskModels {
         );
         if(oldTask.rows[0]) {
             await db.query(
-                `UPDATE tasksTable SET taskName = $2, done = $3, datetime = $4, listId = $5 WHERE id = $1 RETURNING *;`,
+                `UPDATE tasksTable SET taskName = $2, taskDescription = $3, done = $3, duedate = $4, listId = $5 WHERE id = $1 RETURNING *;`,
                 [
                     id, 
                     data.taskName ?? oldTask.taskName,
+                    data.taskDescription ?? oldTask.taskDescription,
                     data.done ?? oldTask.done,
-                    data.datetime ?? oldTask.datetime,
+                    data.duedate ?? oldTask.duedate,
                     listId
                 ]
             );
