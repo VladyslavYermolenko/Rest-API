@@ -1,32 +1,88 @@
-const Task = require('../models/Task');
+const TaskModels = require('../models/TaskModels');
 
 class TaskController {
-    getID(arr, curID) {
-        return Task.getID(arr, curID);
+    async getAllTasks(_, res) {
+        const task = await TaskModels.getAllTasks();
+        res.status(200).json(task);
     }
-    getListIDWithTaskID(taskID) {
-        return Task.getListIDWithTaskID(taskID);
+    async getTask(req, res) {
+        const {listId} = req.params;
+        const task = await TaskModels.getTask(listId);
+        if (task) {
+            res.status(200).json(task);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
-    getAllTasks() {
-        return Task.getAllTasks();
+    async getTasksList(req, res) {
+        const listId = Number(req.params['listId']);
+        const query = req.query['all'] ?? false;
+        const task = await TaskModels.getTasksList(listId, query);
+        if (task) {
+            res.status(200).json(task);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
-    getTaskByListId(curID) {
-        return Task.getTaskByListId(curID);
+    async getTasksId(req, res) {
+        const id = req.params['id'];
+        const listId = req.params['listId'];
+        const task = await TaskModels.getTasksId(id, listId);
+        if (task) {
+            res.status(200).json(task);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
-    createTask(listID, lists) {
-        return Task.createTask(listID, lists);
+    async createTask(req, res) {
+        const listId = req.params['listId'];
+        const data = req.body;
+        const newTask = await TaskModels.createTask(data, listId);
+        if (newTask) {
+            res.status(200).json(newTask);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
-    deleteTask(listID, taskID) {
-        return Task.deleteTask(listID, taskID);
+    async deleteTask(req, res) {
+        const id = req.params['id'];
+        const listId = req.params['listId'];
+        const isDelete = await TaskModels.deleteTask(id, listId);
+        if (isDelete) {
+            res.status(204).send();
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
-    putTask(listID, taskID, lists) {
-        return Task.putTask(listID, taskID, lists);
+    async putTask(req, res) {
+        const id = req.params['id'];
+        const listId = req.params['listId'];
+        const data = req.body;
+        const newTask = await TaskModels.putTask(id, listId, data);
+        if (newTask) {
+            res.status(200).json(newTask);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
-    patchTask(listID, taskID, lists){
-        return Task.patchTask(listID, taskID, lists);
+    async patchTask(req, res) {
+        const id = req.params['id'];
+        const listId = req.params['listId'];
+        const data = req.body;
+        const newTask = await TaskModels.patchTask(id, listId, data);
+        if (newTask) {
+            res.status(200).json(newTask);
+        }
+        else {
+            res.status(404).send('Not Found!');
+        }
     }
 }
 
 module.exports = new TaskController();
-
-// done
