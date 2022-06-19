@@ -46,10 +46,10 @@ class TaskModels {
             `INSERT INTO tasksTable (taskName, taskDescription, done, duedate, listId) 
             VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
             [
-                data.taskName ?? "NULL",
-                data.taskDescription ?? "NULL",
+                data['taskname'] ?? "NULL",
+                data['taskdescription'] ?? "",
                 data.done ?? false,
-                data.duedate ?? new Date().toLocaleDateString('sv'),
+                data.duedate,
                 listId
             ]
         );
@@ -78,10 +78,10 @@ class TaskModels {
                 `UPDATE tasksTable SET taskName = $2, taskDescription = $3, done = $4, duedate = $5, listId = $6 WHERE id = $1 RETURNING *;`,
                 [
                     id, 
-                    data.taskName ?? "NULL",
-                    data.taskDescription ?? "NULL",
+                    data['taskname'] ?? "NULL",
+                    data['taskdescription'] ?? "",
                     data.done ?? false,
-                    data.duedate ?? new Date().toLocaleDateString('sv'),
+                    data.duedate,
                     listId
                 ]
             );
@@ -103,8 +103,8 @@ class TaskModels {
                 `UPDATE tasksTable SET taskName = $2, taskDescription = $3, done = $3, duedate = $4, listId = $5 WHERE id = $1 RETURNING *;`,
                 [
                     id, 
-                    data.taskName ?? oldTask.taskName,
-                    data.taskDescription ?? oldTask.taskDescription,
+                    data['taskname'] ?? oldTask['taskname'],
+                    data['taskdescription'] ?? oldTask['taskdescription'],
                     data.done ?? oldTask.done,
                     data.duedate ?? oldTask.duedate,
                     listId
