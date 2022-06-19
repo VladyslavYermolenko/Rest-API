@@ -98,8 +98,7 @@ class TaskModels {
             `SELECT done FROM tasksTable WHERE id = $1 and listId = $2;`,
             [id, listId]
         );
-        console.log(data);
-        console.log(oldTask.rows);
+        
         if(oldTask.rows[0]) {
             await db.query(
                 `UPDATE tasksTable SET done = $2 WHERE id = $1 RETURNING *;`,
