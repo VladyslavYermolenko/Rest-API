@@ -95,19 +95,17 @@ class TaskModels {
 
     async patchTask(id, listId, data) {
         const oldTask = await db.query(
-            `SELECT * FROM tasksTable WHERE id = $1 and listId = $2;`,
+            `SELECT done FROM tasksTable WHERE id = $1 and listId = $2;`,
             [id, listId]
         );
+        console.log(data);
+        console.log(oldTask.rows);
         if(oldTask.rows[0]) {
             await db.query(
-                `UPDATE tasksTable SET taskName = $2, taskDescription = $3, done = $3, duedate = $4, listId = $5 WHERE id = $1 RETURNING *;`,
+                `UPDATE tasksTable SET done = $2 WHERE id = $1 RETURNING *;`,
                 [
                     id, 
-                    data['taskname'] ?? oldTask['taskname'],
-                    data['taskdescription'] ?? oldTask['taskdescription'],
-                    data.done ?? oldTask.done,
-                    data.duedate ?? oldTask.duedate,
-                    listId
+                    data.done ?? oldTask.rows.done,
                 ]
             );
             const newTask = await db.query(
